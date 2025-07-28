@@ -2,45 +2,36 @@ import { useCallback, useMemo } from 'react';
 import { StyleSheet, View, type TextStyle, type ViewStyle } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-import PillSwitchItem from './PillSwitchItem';
+import SegmentedControlSwitchItem from './SegmentedControlSwitchItem';
 import type { ControlOption } from './types';
 import type { ControlListState } from './useControlListState';
 
 type AlignmentOption = 'left' | 'right' | 'center';
 
-export type PillSwitchProps<TValue> = {
-  controlListState: ControlListState<TValue>;
+export type SegmentedControlStylingProps = {
   align?: AlignmentOption;
-  onPressCallback?: (value: TValue) => void;
-
-  // Styling props
   customItemStyle?: ViewStyle;
   containerHeight?: number;
   itemHeight?: number;
-
   inactiveBackgroundColor?: string;
   activeBackgroundColor?: string;
   inactiveTextColor?: string;
   activeTextColor?: string;
+  customContainerStyle?: ViewStyle;
   customTextStyle?: TextStyle;
+  customActiveOptionStyle?: ViewStyle;
 };
 
-function PillSwitch<TValue>(props: PillSwitchProps<TValue>) {
-  const {
-    controlListState,
-    align = 'center',
-    onPressCallback,
-    customItemStyle,
-    containerHeight = 50,
-    itemHeight = 48,
+export type SegmentedControlProps<TValue> = SegmentedControlStylingProps & {
+  onPressItem?: (value: TValue) => void;
+};
 
-    inactiveBackgroundColor = 'rgb(232, 221, 250)',
-    activeBackgroundColor = 'rgb(124, 58, 237)',
-    inactiveTextColor = 'rgb(124, 58, 237)',
-    activeTextColor = '#fff',
-    customTextStyle,
-  } = props;
+export type SegmentedControlSwitchProps<TValue> = ControlListState<TValue> &
+  SegmentedControlProps<TValue>;
 
+function SegmentedControlSwitch<TValue>(
+  props: SegmentedControlSwitchProps<TValue>
+) {
   const {
     options,
     activeOption,
@@ -50,7 +41,21 @@ function PillSwitch<TValue>(props: PillSwitchProps<TValue>) {
     animatedActiveOptionStyle,
     scrollHandler,
     controlListRef,
-  } = controlListState;
+    onPressItem,
+
+    // Style props
+    align = 'center',
+    customItemStyle,
+    containerHeight = 50,
+    itemHeight = 48,
+    inactiveBackgroundColor = 'rgb(232, 221, 250)',
+    activeBackgroundColor = 'rgb(124, 58, 237)',
+    inactiveTextColor = 'rgb(124, 58, 237)',
+    activeTextColor = '#fff',
+    customContainerStyle,
+    customTextStyle,
+    customActiveOptionStyle,
+  } = props;
 
   const containerPadding = (containerHeight - itemHeight) / 2;
 
@@ -65,14 +70,14 @@ function PillSwitch<TValue>(props: PillSwitchProps<TValue>) {
 
   const renderItem = useCallback(
     ({ item, index }: { item: ControlOption<TValue>; index: number }) => (
-      <PillSwitchItem
+      <SegmentedControlSwitchItem
         item={item}
         isActive={activeOption === item.value}
         index={index}
         onLayout={onLayoutOptionItem}
         onChange={() => {
+          onPressItem?.(item.value);
           onAnimationFinish(item.value);
-          onPressCallback?.(item.value);
         }}
         animatedActiveOptionIndex={animatedActiveOptionIndex}
         textColorActive={activeTextColor}
@@ -86,7 +91,7 @@ function PillSwitch<TValue>(props: PillSwitchProps<TValue>) {
       activeOption,
       onAnimationFinish,
       animatedActiveOptionIndex,
-      onPressCallback,
+      onPressItem,
       defaultItemStyle,
       customItemStyle,
       activeTextColor,
@@ -117,11 +122,12 @@ function PillSwitch<TValue>(props: PillSwitchProps<TValue>) {
   if (!options.length) return null;
 
   return (
-    <View style={[styles.container, containerStyles]}>
+    <View style={[styles.container, containerStyles, customContainerStyle]}>
       <Animated.View
         style={[
           styles.activeOption,
           defaultActiveOptionStyles,
+          customActiveOptionStyle,
           animatedActiveOptionStyle,
         ]}
       />
@@ -153,4 +159,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PillSwitch;
+export default SegmentedControlSwitch;

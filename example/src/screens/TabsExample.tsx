@@ -1,30 +1,24 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, Text, View } from 'react-native';
 import { MultiswitchController } from 'react-native-multiswitch-controller';
-
-export default function ExamplePillsScreen() {
+export default function TabsExampleScreen() {
   return (
     <LinearGradient colors={['#FFF5E6', '#FFE4B5']} style={styles.container}>
       <View style={styles.exampleContainer}>
-        <Text style={styles.title}>Time of Day</Text>
+        <Text style={styles.title}>TABS !!!!</Text>
         <MultiswitchController
-          controlListProps={{
-            options: [
-              { value: 'morning', label: '🌅' },
-              { value: 'afternoon', label: '☀️' },
-              { value: 'evening', label: '🌇' },
-              { value: 'night', label: '🌙' },
-            ],
-            defaultOption: 'morning',
-            variant: 'segmentedControl',
+          options={[
+            { value: 'morning', label: '🌅' },
+            { value: 'afternoon', label: '☀️' },
+            { value: 'evening', label: '🌇' },
+            { value: 'night', label: '🌙' },
+          ]}
+          defaultOption="morning"
+          variant="segmentedControl"
+          onControlListStateChange={(value) => {
+            console.log('State onControlListStateChange changed:', value);
           }}
-          onControlListStateChange={(state) => {
-            console.log(
-              'State onControlListStateChange changed:',
-              state.activeOption
-            );
-          }}
-          pillSwitchProps={{
+          segmentedControlProps={{
             inactiveBackgroundColor: 'rgba(59, 130, 246, 0.08)',
             activeBackgroundColor: 'rgb(37, 99, 235)',
           }}

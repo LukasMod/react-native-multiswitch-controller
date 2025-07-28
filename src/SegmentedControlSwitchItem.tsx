@@ -15,12 +15,12 @@ import type { ControlOption } from './types';
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
-export type PillSwitchVariant = {
+export type SegmentedControlVariant = {
   optionsWrapperPadding: number;
   optionHeight: number;
 };
 
-function PillSwitchItem<TValue>(props: {
+function SegmentedControlSwitchItem<TValue>(props: {
   item: ControlOption<TValue>;
   isActive: boolean;
   index: number;
@@ -86,4 +86,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PillSwitchItem;
+export default SegmentedControlSwitchItem;

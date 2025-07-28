@@ -5,6 +5,8 @@ import {
   useRef,
   useState,
   useMemo,
+  useImperativeHandle,
+  type Ref,
 } from 'react';
 import { FlatList, type LayoutChangeEvent } from 'react-native';
 import {
@@ -32,17 +34,18 @@ export type ControlListProps<TValue> = {
   };
 };
 
+export type ControlListRef<TValue> = {
+  setForcedOption: (value: TValue | null) => void;
+  activeOption: TValue;
+};
+
 export type ControlListState<TValue> = {
   options: ControlOption<TValue>[];
   activeOption: TValue;
-  initialOption: TValue | null;
   animatedActiveOptionIndex: SharedValue<number | null>;
   animatedActiveOptionStyle: StyleProps;
   scrollHandler: ReturnType<typeof useAnimatedScrollHandler>;
   controlListRef: RefObject<FlatList<ControlOption<TValue>> | null>;
-  onChange: (value: TValue, callback?: () => void) => void;
-  setInitialOption: (value: TValue | null) => void;
-  removeInitialOption: () => void;
   onLayoutOptionItem: (event: LayoutChangeEvent, index: number) => void;
   onAnimationFinish: (
     newValue: TValue,
@@ -56,7 +59,8 @@ export type ControlListState<TValue> = {
  * */
 
 function useControlListState<TValue>(
-  props: ControlListProps<TValue>
+  props: ControlListProps<TValue>,
+  ref?: Ref<ControlListRef<TValue>>
 ): ControlListState<TValue> {
   const {
     options,
@@ -73,7 +77,7 @@ function useControlListState<TValue>(
 
   const [activeOption, setActiveOption] = useState<TValue>(defaultOption);
 
-  const [initialOption, setInitialOption] = useState<TValue | null>(
+  const [forcedOption, setForcedOption] = useState<TValue | null>(
     defaultOption
   );
 
@@ -91,6 +95,15 @@ function useControlListState<TValue>(
   const animatedActiveOptionIndex = useSharedValue<number | null>(null);
 
   const isFirstRender = useRef(true);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      setForcedOption,
+      activeOption,
+    }),
+    [activeOption]
+  );
 
   const animatedActiveOptionStyle = useAnimatedStyle(() => ({
     transform: [
@@ -201,7 +214,7 @@ function useControlListState<TValue>(
   const onChange = useCallback(
     (value: TValue, callback?: () => void) => {
       setActiveOption(value);
-      setInitialOption(null);
+      setForcedOption(null);
       callback?.();
       onPressCallback?.(value);
     },
@@ -221,19 +234,19 @@ function useControlListState<TValue>(
   );
 
   // Fires after initial animation is finished to allow future setting of initial value, which will force animation.
-  const removeInitialOption = useCallback(() => setInitialOption(null), []);
+  const removeInitialOption = useCallback(() => setForcedOption(null), []);
 
-  // First time animation, based on initialOption after layout is calculated.
+  // First time animation, based on forcedOption after layout is calculated.
   useEffect(() => {
     if (
-      initialOption &&
+      forcedOption &&
       Object.values(optionLayouts).length === options.length
     ) {
       removeInitialOption();
-      onAnimationFinish(initialOption, () => (isFirstRender.current = false));
+      onAnimationFinish(forcedOption, () => (isFirstRender.current = false));
     }
   }, [
-    initialOption,
+    forcedOption,
     onAnimationFinish,
     removeInitialOption,
     optionLayouts,
@@ -264,14 +277,10 @@ function useControlListState<TValue>(
   return {
     options,
     activeOption,
-    initialOption,
     animatedActiveOptionIndex,
     animatedActiveOptionStyle,
     scrollHandler,
     controlListRef,
-    onChange,
-    setInitialOption,
-    removeInitialOption,
     onLayoutOptionItem,
     onAnimationFinish,
   };

@@ -1,28 +1,68 @@
-import { useEffect } from 'react';
-import PillSwitch, { type PillSwitchProps } from './PillSwitch';
-import type { ControlListProps, ControlListState } from './useControlListState';
-import useControlListState from './useControlListState';
+import { useEffect, type Ref } from 'react';
+import SegmentedControlSwitch, {
+  type SegmentedControlProps,
+} from './SegmentedControlSwitch';
+import useControlListState, {
+  type ControlListRef,
+} from './useControlListState';
+import type { ControlOption } from './types';
 
 type MultiswitchControllerProps<TValue> = {
-  controlListProps: ControlListProps<TValue>;
-  onControlListStateChange: (state: ControlListState<TValue>) => void;
-  pillSwitchProps?: Omit<PillSwitchProps<TValue>, 'controlListState'>;
+  options: ControlOption<TValue>[];
+  defaultOption: TValue;
+  variant?: 'segmentedControl' | 'tabs';
+  onChangeOption?: (value: TValue) => void;
+  styleProps?: SegmentedControlProps<TValue>;
+  onPressItem?: (value: TValue) => void;
+  ref?: Ref<ControlListRef<TValue>>;
 };
 
-export default function MultiswitchController<TValue>({
-  controlListProps,
-  onControlListStateChange,
-  pillSwitchProps,
+function MultiswitchController<TValue>({
+  options,
+  defaultOption,
+  variant = 'segmentedControl',
+  onChangeOption,
+  onPressItem,
+  styleProps,
+  ref,
 }: MultiswitchControllerProps<TValue>) {
-  const controlListState = useControlListState(controlListProps);
+  const {
+    activeOption,
+    onLayoutOptionItem,
+    onAnimationFinish,
+    animatedActiveOptionIndex,
+    animatedActiveOptionStyle,
+    scrollHandler,
+    controlListRef,
+  } = useControlListState(
+    {
+      options,
+      defaultOption,
+      variant,
+    },
+    ref
+  );
 
   useEffect(() => {
-    if (onControlListStateChange) {
-      onControlListStateChange(controlListState);
+    if (onChangeOption) {
+      onChangeOption(activeOption);
     }
-  }, [controlListState, onControlListStateChange]);
+  }, [activeOption, onChangeOption]);
 
   return (
-    <PillSwitch controlListState={controlListState} {...pillSwitchProps} />
+    <SegmentedControlSwitch
+      options={options}
+      activeOption={activeOption}
+      onLayoutOptionItem={onLayoutOptionItem}
+      onAnimationFinish={onAnimationFinish}
+      animatedActiveOptionIndex={animatedActiveOptionIndex}
+      animatedActiveOptionStyle={animatedActiveOptionStyle}
+      scrollHandler={scrollHandler}
+      controlListRef={controlListRef}
+      onPressItem={onPressItem}
+      {...styleProps}
+    />
   );
 }
+
+export default MultiswitchController;
