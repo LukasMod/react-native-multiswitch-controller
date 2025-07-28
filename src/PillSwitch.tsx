@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { StyleSheet, View, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type TextStyle, type ViewStyle } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import PillSwitchItem from './PillSwitchItem';
@@ -22,6 +22,7 @@ export type PillSwitchProps<TValue> = {
   activeBackgroundColor?: string;
   inactiveTextColor?: string;
   activeTextColor?: string;
+  customTextStyle?: TextStyle;
 };
 
 function PillSwitch<TValue>(props: PillSwitchProps<TValue>) {
@@ -37,6 +38,7 @@ function PillSwitch<TValue>(props: PillSwitchProps<TValue>) {
     activeBackgroundColor = 'rgb(124, 58, 237)',
     inactiveTextColor = 'rgb(124, 58, 237)',
     activeTextColor = '#fff',
+    customTextStyle,
   } = props;
 
   const {
@@ -76,6 +78,7 @@ function PillSwitch<TValue>(props: PillSwitchProps<TValue>) {
         textColorActive={activeTextColor}
         textColorInactive={inactiveTextColor}
         itemContainerStyle={{ ...defaultItemStyle, ...customItemStyle }}
+        customTextStyle={customTextStyle}
       />
     ),
     [
@@ -88,6 +91,7 @@ function PillSwitch<TValue>(props: PillSwitchProps<TValue>) {
       customItemStyle,
       activeTextColor,
       inactiveTextColor,
+      customTextStyle,
     ]
   );
 
