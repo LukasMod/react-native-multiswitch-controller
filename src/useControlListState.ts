@@ -19,7 +19,7 @@ import {
 } from 'react-native-reanimated';
 import type { ControlOption } from './types';
 
-type ControlListProps<TValue> = {
+export type ControlListProps<TValue> = {
   options: ControlOption<TValue>[];
   optionPadding?: number;
   optionGap?: number;
