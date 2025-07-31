@@ -1,174 +1,108 @@
-# React Native Multi-Switch Controller
+# React Native Multiswitch Controller
 
-A flexible and performant multi-switch controller for React Native with support for segmented controls and tabs.
+A smooth, animated multiswitch component for React Native with dynamic width support. Perfect for creating segmented controls and tab interfaces with fluid animations.
+
+## Why?
+
+In my last project, there were specific design requirements for segmented control buttons and tabs with customized UI.
+It was a simple task, but I encountered several problems with the existing solutions I found online:
+
+- Hard to customize styles for my UI requirements
+- Same width for all options (no dynamic sizing)
+- Based on the old Animated API or no animations at all
+- Issues when changing text color for active options - brief moments when text color matches the background
+- Issues with setting new values externally, such as based on route parameters
+- Issues with language changes - width recalculation was needed
+- Instant heavy calculations and screen re-renders (usually these segmented controls were at the top of the screen) mixed with animations - all together when users interact caused FPS drops
+- No scrolling if there are multiple options
+
+**Solution:**
+
+- Width calculated based on each item's layout
+- Scrolling enabled by FlatList
+- `onChangeOption` fired after animation is complete, not simultaneously
+- `onPressItem` for instant reaction if needed
+- Ref API to get value or force update
+- Width recalculation when label is changed
 
 ## Features
 
-- 🎯 **Zero Re-renders**: Access state outside provider without causing re-renders
-- 🎨 **Customizable**: Full control over colors, sizes, and styling
-- ⚡ **Performant**: Optimized animations and state management
-- 🔄 **Flexible**: Support for segmented controls and tabs
-- 📱 **Accessible**: Built-in accessibility support
+- 🎯 **Smooth Animations**: Powered by react-native-reanimated for 60fps animations
+- 📱 **Two Variants**: Segmented control and tabs styles
+- 🎨 **Highly Customizable**: Extensive styling options for every element
+- 📏 **Dynamic Width**: Automatically adjusts to content width, when language changes
+- 📜 **Scrollable**: Horizontal scrolling for many options
+- 🎪 **Flexible Alignment**: Left, center, or right alignment options
+- 🎛️ **Imperative API**: Ref-based methods for programmatic control
 
 ## Installation
 
 ```bash
 npm install react-native-multiswitch-controller
+# or
+yarn add react-native-multiswitch-controller
 ```
 
-## Basic Usage
+### Peer Dependencies
+
+This library requires:
+
+- `react-native-reanimated` >= 3.0.0
+
+## Quick Start
 
 ```tsx
-import {
-  ControlListProvider,
-  PillSwitch,
-} from 'react-native-multiswitch-controller';
+import { MultiswitchController } from 'react-native-multiswitch-controller';
 
 function MyComponent() {
-  return (
-    <ControlListProvider
-      controlListProps={{
-        options: [
-          { value: 'morning', label: '🌅' },
-          { value: 'afternoon', label: '☀️' },
-          { value: 'evening', label: '🌇' },
-          { value: 'night', label: '🌙' },
-        ],
-        defaultOption: 'morning',
-        variant: 'segmentedControl',
-      }}
-    >
-      <PillSwitch
-        inactiveBackgroundColor="rgba(59, 130, 246, 0.08)"
-        activeBackgroundColor="rgb(37, 99, 235)"
-        inactiveTextColor="rgb(37, 99, 235)"
-        activeTextColor="rgb(253, 230, 138)"
-      />
-    </ControlListProvider>
-  );
-}
-```
-
-## Accessing State Outside Provider
-
-To avoid unnecessary re-renders while still accessing the control state, use one of these approaches:
-
-### Option 1: Ref-based Access (Recommended)
-
-```tsx
-import { useControlListStateRef } from 'react-native-multiswitch-controller';
-
-function StateReader() {
-  const stateRef = useControlListStateRef<string>();
-
-  const handleGetCurrentValue = () => {
-    const currentState = stateRef.current;
-    if (currentState) {
-      console.log('Current active option:', currentState.activeOption);
-      console.log('All options:', currentState.options);
-    }
-  };
+  const [selectedOption, setSelectedOption] = useState('morning');
 
   return (
-    <View>
-      <Text>
-        Current value: {stateRef.current?.activeOption || 'Loading...'}
-      </Text>
-      <Button title="Log State" onPress={handleGetCurrentValue} />
-    </View>
-  );
-}
-```
-
-### Option 2: Event-based Subscription
-
-```tsx
-import { useControlListStateSubscription } from 'react-native-multiswitch-controller';
-
-function StateSubscriber() {
-  const [lastChange, setLastChange] = useState<string>('None');
-
-  useControlListStateSubscription<string>((state) => {
-    setLastChange(state.activeOption);
-    console.log('State changed to:', state.activeOption);
-  });
-
-  return (
-    <View>
-      <Text>Last change: {lastChange}</Text>
-    </View>
+    <MultiswitchController
+      options={[
+        { value: 'morning', label: '🌅 Morning' },
+        { value: 'afternoon', label: '☀️ Afternoon' },
+        { value: 'evening', label: '🌇 Evening' },
+        { value: 'night', label: '🌙 Night' },
+      ]}
+      defaultOption={selectedOption}
+      onChangeOption={setSelectedOption}
+    />
   );
 }
 ```
 
 ## API Reference
 
-### ControlListProvider
+### Props
 
-The provider component that manages the control list state.
+| Prop             | Type                           | Default              | Description                        |
+| ---------------- | ------------------------------ | -------------------- | ---------------------------------- |
+| `options`        | `ControlOption<TValue>[]`      | **required**         | Array of options to display        |
+| `defaultOption`  | `TValue`                       | **required**         | Initial selected option            |
+| `variant`        | `'segmentedControl' \| 'tabs'` | `'segmentedControl'` | Visual style variant               |
+| `onChangeOption` | `(value: TValue) => void`      | -                    | Callback after animation completes |
+| `onPressItem`    | `(value: TValue) => void`      | -                    | Instant callback on press          |
 
-```tsx
-<ControlListProvider
-  controlListProps={{
-    options: ControlOption<TValue>[];
-    defaultOption: TValue;
-    variant?: 'segmentedControl' | 'tabs';
-    onPressCallback?: (value: TValue) => void;
-    tabConfig?: { gap: number; padding: number };
-  }}
->
-  {children}
-</ControlListProvider>
-```
+| `ref` | `Ref<ControlListRef<TValue>>` | - | Ref for imperative API |
 
-### PillSwitch
+### Styling Props
 
-The main switch component.
+| Prop                           | Type                            | Default    | Description                      |
+| ------------------------------ | ------------------------------- | ---------- | -------------------------------- |
+| `containerStyle`               | `ViewStyle`                     | -          | Main container styles            |
+| `inactiveOptionContainerStyle` | `ViewStyle`                     | -          | Inactive option container styles |
+| `activeOptionContainerStyle`   | `ViewStyle`                     | -          | Active option container styles   |
+| `inactiveTextStyle`            | `TextStyle`                     | -          | Inactive text styles             |
+| `activeTextStyle`              | `TextStyle`                     | -          | Active text styles               |
+| `containerHeight`              | `number`                        | `50`       | Height of the main container     |
+| `containerPadding`             | `number`                        | `auto`     | Padding around the container     |
+| `optionGap`                    | `number`                        | `0`        | Gap between options              |
+| `optionHeight`                 | `number`                        | `48`       | Height of individual options     |
+| `optionPadding`                | `number`                        | `0`        | Padding inside options           |
+| `align`                        | `'left' \| 'center' \| 'right'` | `'center'` | Alignment of options             |
 
-```tsx
-<PillSwitch
-  align?: 'left' | 'right' | 'center';
-  onPressCallback?: (value: TValue) => void;
-  inactiveOptionContainerStyle?: ViewStyle;
-  containerHeight?: number;
-  optionHeight?: number;
-  inactiveBackgroundColor?: string;
-  activeBackgroundColor?: string;
-  inactiveTextColor?: string;
-  activeTextColor?: string;
-  inactiveTextStyle?: TextStyle;
-/>
-```
-
-### Hooks
-
-#### useControlListStateRef
-
-Returns a ref to the current state without causing re-renders.
-
-```tsx
-const stateRef = useControlListStateRef<TValue>();
-// Access state via stateRef.current
-```
-
-#### useControlListStateSubscription
-
-Subscribe to state changes without re-renders.
-
-```tsx
-useControlListStateSubscription<TValue>((state) => {
-  // Handle state changes
-});
-```
-
-## Performance Benefits
-
-- **Ref-based access**: No re-renders when reading state
-- **Event-based subscription**: Only re-renders when you explicitly handle changes
-- **Optimized animations**: Smooth transitions with minimal performance impact
-- **Memoized callbacks**: Prevents unnecessary re-renders in child components
-
-## Types
+### Types
 
 ```tsx
 type ControlOption<TValue> = {
@@ -176,13 +110,196 @@ type ControlOption<TValue> = {
   label: string;
 };
 
-type ControlListState<TValue> = {
-  options: ControlOption<TValue>[];
+type ControllerVariant = 'segmentedControl' | 'tabs';
+
+type ControlListRef<TValue> = {
+  setForcedOption: (value: TValue | null) => void;
   activeOption: TValue;
-  onChange: (value: TValue, callback?: () => void) => void;
-  // ... other properties
 };
 ```
+
+## Examples
+
+### Basic Segmented Control
+
+```tsx
+<MultiswitchController<TimeOfDay>
+  variant="segmentedControl"
+  defaultOption="morning"
+  options={[
+    { value: 'morning', label: '🌅' },
+    { value: 'afternoon', label: '☀️' },
+    { value: 'evening', label: '🌇' },
+    { value: 'night', label: '🌙' },
+  ]}
+  onChangeOption={onChangeOption}
+  optionGap={10}
+/>
+```
+
+### Alignment Examples
+
+```tsx
+// Left alignment
+<MultiswitchController<'First' | 'Second'>
+  options={[
+    { value: 'First', label: 'First' },
+    { value: 'Second', label: 'Second' },
+  ]}
+  defaultOption="First"
+  align="left"
+/>
+
+// Center alignment
+<MultiswitchController<'First' | 'Second'>
+  options={[
+    { value: 'First', label: 'First' },
+    { value: 'Second', label: 'Second' },
+  ]}
+  defaultOption="First"
+  align="center"
+/>
+
+// Right alignment
+<MultiswitchController<'First' | 'Second' | 'Third'>
+  options={[
+    { value: 'First', label: 'First' },
+    { value: 'Second', label: 'Second' },
+    { value: 'Third', label: 'Third' },
+  ]}
+  defaultOption="First"
+  align="right"
+
+/>
+```
+
+### Imperative API
+
+For programmatic control without managing state, you can use the imperative ref API:
+
+```tsx
+import { useRef } from 'react';
+import {
+  MultiswitchController,
+  type ControlListRef,
+} from 'react-native-multiswitch-controller';
+
+function MyComponent() {
+  const controllerRef = useRef<ControlListRef<string>>(null);
+
+  const setOption = (option: string) => {
+    controllerRef.current?.setForcedOption(option);
+  };
+
+  return (
+    <>
+      <MultiswitchController
+        ref={controllerRef}
+        options={[
+          { value: 'morning', label: 'Morning' },
+          { value: 'afternoon', label: 'Afternoon' },
+          { value: 'evening', label: 'Evening' },
+        ]}
+        defaultOption="morning"
+        onChangeOption={(value) => console.log('Selected:', value)}
+      />
+      <Button title="Set Evening" onPress={() => setOption('evening')} />
+    </>
+  );
+}
+```
+
+#### Imperative API Methods
+
+| Method            | Type                              | Description                                   |
+| ----------------- | --------------------------------- | --------------------------------------------- |
+| `setForcedOption` | `(value: TValue \| null) => void` | Programmatically set an option with animation |
+| `activeOption`    | `TValue`                          | Read the currently active option              |
+
+**Note**: The imperative API is useful for external control scenarios like changing active option based on route prop
+
+### Scrollable Options
+
+```tsx
+<MultiswitchController<
+  | 'First'
+...
+  | 'Sixteenth'
+>
+  options={[
+    { value: 'First', label: 'First' },
+...
+    { value: 'Sixteenth', label: 'Sixteenth' },
+  ]}
+  defaultOption="First"
+  variant={variant}
+/>
+```
+
+### Dynamic Width with Different Label Lengths
+
+```tsx
+<MultiswitchController<'First' | 'Second'>
+  options={[
+    { value: 'First', label: 'First is a very long label' },
+    { value: 'Second', label: 'Second is short' },
+  ]}
+  variant={variant}
+  defaultOption="First"
+/>
+```
+
+### Dynamic Labels (Language Changes)
+
+```tsx
+const mockLanguages = {
+  en: {
+    food: 'Butterfly',
+    drink: 'Cheese',
+    dessert: 'Lettuce',
+  },
+  de: {
+    food: 'Schmetterling',
+    drink: 'Käse',
+    dessert: 'Salat',
+  },
+};
+
+const [language, setLanguage] = useState<'en' | 'de'>('en');
+
+<MultiswitchController<'food' | 'drink' | 'dessert'>
+  options={[
+    { value: 'food', label: mockLanguages[language].food },
+    { value: 'drink', label: mockLanguages[language].drink },
+    { value: 'dessert', label: mockLanguages[language].dessert },
+  ]}
+  defaultOption="food"
+/>;
+```
+
+## Callback Differences
+
+- **`onChangeOption`**: Called after the animation completes
+- **`onPressItem`**: Called immediately when an option is pressed
+
+```tsx
+<MultiswitchController
+  options={options}
+  defaultOption="option1"
+  onChangeOption={(value) => {
+    // Called after animation finishes
+    console.log('Animation complete, selected:', value);
+  }}
+  onPressItem={(value) => {
+    // Called immediately on press
+    console.log('Pressed:', value);
+  }}
+/>
+```
+
+## To Do
+
+- Allow passing SVG instead of text only
 
 ## Contributing
 
@@ -194,4 +311,4 @@ type ControlListState<TValue> = {
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT © [LukasMod](https://github.com/LukasMod)

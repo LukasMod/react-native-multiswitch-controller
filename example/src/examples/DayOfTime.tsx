@@ -32,9 +32,6 @@ export default function DayOfTime({
         ]}
         ref={multiswitchControllerRef}
         onChangeOption={onChangeOption}
-        onPressItem={(_value) => {
-          // Instant callback, without waiting for animation to finish
-        }}
         optionGap={10}
         containerStyle={styles.containerStyle}
         activeOptionContainerStyle={styles.activeOptionContainerStyle}
