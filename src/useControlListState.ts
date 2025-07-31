@@ -23,15 +23,10 @@ import type { ControlOption } from './types';
 
 export type ControlListProps<TValue> = {
   options: ControlOption<TValue>[];
-  optionPadding?: number;
-  optionGap?: number;
+  optionPadding: number;
+  optionGap: number;
   defaultOption: TValue;
-  variant?: 'segmentedControl' | 'tabs';
   onPressCallback?: (value: TValue) => void;
-  tabConfig?: {
-    gap: number;
-    padding: number;
-  };
 };
 
 export type ControlListRef<TValue> = {
@@ -55,25 +50,17 @@ export type ControlListState<TValue> = {
 
 /**
  *  Helps with animation of SegmentedControl and Tabs.
- *  To avoid lags while animating, SegmentedControl/Tabs needs to be animated first, and after that the content may be refreshed.
+ *  To avoid fps drops while animating, SegmentedControl/Tabs needs to be animated first, and after that the content may be refreshed.
  * */
 
 function useControlListState<TValue>(
   props: ControlListProps<TValue>,
   ref?: Ref<ControlListRef<TValue>>
 ): ControlListState<TValue> {
-  const {
-    options,
-    defaultOption,
-    variant = 'segmentedControl',
-    onPressCallback,
-    tabConfig,
-  } = props;
+  const { options, defaultOption, onPressCallback, optionGap, optionPadding } =
+    props;
 
   const optionsRef = useRef(options);
-
-  const optionGap = variant === 'tabs' ? tabConfig?.gap || 20 : 0;
-  const optionPadding = variant === 'tabs' ? tabConfig?.padding || 10 : 0;
 
   const [activeOption, setActiveOption] = useState<TValue>(defaultOption);
 

@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import {
   MultiswitchController,
   type ControllerVariant,
@@ -20,21 +19,45 @@ export default function LongLabel({ variant }: LongLabelProps) {
         ]}
         variant={variant}
         defaultOption="First"
-        styleProps={{
-          containerHeight: 48,
-          itemHeight: 36,
-          inactiveBackgroundColor: 'rgba(30, 64, 175, 0.08)',
-          activeBackgroundColor: 'rgb(30, 64, 175)',
-          inactiveTextColor: 'rgb(30, 64, 175)',
-          customTextStyle: styles.smallText,
-        }}
+        containerHeight={48}
+        optionHeight={36}
+        optionGap={16}
+        inactiveTextStyle={styles.inactiveTextStyle}
+        containerStyle={styles.containerStyle}
+        activeOptionContainerStyle={
+          variant === 'tabs'
+            ? styles.activeOptionContainerStyleTabs
+            : styles.activeOptionContainerStyleSegmentedControl
+        }
+        activeTextStyle={
+          variant === 'tabs'
+            ? styles.activeTextStyleTabs
+            : styles.activeTextStyleSegmentedControl
+        }
       />
     </ExampleWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  smallText: {
+  inactiveTextStyle: {
     fontSize: 12,
+    color: 'rgb(30, 64, 175)',
+  },
+  containerStyle: {
+    backgroundColor: 'rgba(30, 64, 175, 0.08)',
+  },
+  activeOptionContainerStyleTabs: {
+    backgroundColor: 'rgb(30, 64, 175)',
+    height: 10,
+  },
+  activeOptionContainerStyleSegmentedControl: {
+    backgroundColor: 'rgb(30, 64, 175)',
+  },
+  activeTextStyleTabs: {
+    color: 'rgb(30, 64, 175)',
+  },
+  activeTextStyleSegmentedControl: {
+    color: '#fff',
   },
 });

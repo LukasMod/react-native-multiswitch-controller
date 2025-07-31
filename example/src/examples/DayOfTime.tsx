@@ -35,10 +35,9 @@ export default function DayOfTime({
         onPressItem={(_value) => {
           // Instant callback, without waiting for animation to finish
         }}
-        styleProps={{
-          inactiveBackgroundColor: 'rgba(59, 130, 246, 0.08)',
-          activeBackgroundColor: 'rgb(37, 99, 235)',
-        }}
+        optionGap={10}
+        containerStyle={styles.containerStyle}
+        activeOptionContainerStyle={styles.activeOptionContainerStyle}
       />
       <View style={styles.buttonsContainer}>
         <Button
@@ -64,5 +63,12 @@ const styles = StyleSheet.create({
     gap: 10,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  containerStyle: {
+    backgroundColor: 'rgba(59, 130, 246, 0.08)',
+  },
+  activeOptionContainerStyle: {
+    backgroundColor: 'rgb(37, 99, 235)',
   },
 });

@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import {
   MultiswitchController,
   type ControllerVariant,
@@ -50,10 +49,6 @@ export default function Scrollable({ variant }: ScrollableProps) {
         ]}
         defaultOption="First"
         variant={variant}
-        styleProps={{
-          containerHeight: 54,
-          itemHeight: 48,
-        }}
       />
     </ExampleWrapper>
   );

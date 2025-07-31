@@ -10,10 +10,9 @@ type MultiswitchControllerProps<TValue> = {
   defaultOption: TValue;
   variant?: ControllerVariant;
   onChangeOption?: (value: TValue) => void;
-  styleProps?: SwitchListStylingProps;
   onPressItem?: (value: TValue) => void;
   ref?: Ref<ControlListRef<TValue>>;
-};
+} & Partial<SwitchListStylingProps>;
 
 function MultiswitchController<TValue>({
   options,
@@ -21,7 +20,20 @@ function MultiswitchController<TValue>({
   variant = 'segmentedControl',
   onChangeOption,
   onPressItem,
-  styleProps,
+
+  // Style props
+  containerStyle,
+  inactiveOptionContainerStyle,
+  activeOptionContainerStyle,
+  inactiveTextStyle,
+  activeTextStyle,
+  containerHeight = 50,
+  containerPadding,
+  optionGap = 0,
+  optionHeight = 48,
+  optionPadding = 0,
+  align = 'center',
+
   ref,
 }: MultiswitchControllerProps<TValue>) {
   const {
@@ -36,7 +48,8 @@ function MultiswitchController<TValue>({
     {
       options,
       defaultOption,
-      variant,
+      optionGap,
+      optionPadding,
     },
     ref
   );
@@ -46,6 +59,9 @@ function MultiswitchController<TValue>({
       onChangeOption(activeOption);
     }
   }, [activeOption, onChangeOption]);
+
+  const containerPaddingCalculated =
+    containerPadding ?? (containerHeight - optionHeight) / 2;
 
   return (
     <SwitchList
@@ -59,7 +75,17 @@ function MultiswitchController<TValue>({
       controlListRef={controlListRef}
       onPressItem={onPressItem}
       variant={variant}
-      {...styleProps}
+      containerStyle={containerStyle}
+      inactiveOptionContainerStyle={inactiveOptionContainerStyle}
+      activeOptionContainerStyle={activeOptionContainerStyle}
+      inactiveTextStyle={inactiveTextStyle}
+      activeTextStyle={activeTextStyle}
+      containerHeight={containerHeight}
+      containerPadding={containerPaddingCalculated}
+      optionGap={optionGap}
+      optionHeight={optionHeight}
+      optionPadding={optionPadding}
+      align={align}
     />
   );
 }

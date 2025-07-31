@@ -13,6 +13,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import type { ControllerVariant, ControlOption } from './types';
 import { memo } from 'react';
+import { variantColors } from './constants';
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
@@ -24,12 +25,11 @@ function SwitchItem<TValue>(props: {
   onChange: (value: TValue) => void;
   variant: ControllerVariant;
 
-  customTextStyle?: TextStyle;
+  inactiveTextStyle?: TextStyle;
+  activeTextStyle?: TextStyle;
   itemContainerStyle?: ViewStyle;
 
   animatedActiveOptionIndex?: SharedValue<number | null>;
-  textColorActive: string;
-  textColorInactive: string;
 }) {
   const {
     item,
@@ -39,16 +39,21 @@ function SwitchItem<TValue>(props: {
     index,
     variant,
 
-    customTextStyle,
+    inactiveTextStyle,
+    activeTextStyle,
     itemContainerStyle,
 
     animatedActiveOptionIndex,
-    textColorActive,
-    textColorInactive,
   } = props;
 
+  const textColorActive =
+    (activeTextStyle?.color as string) || variantColors[variant].activeText;
+
+  const textColorInactive =
+    (inactiveTextStyle?.color as string) || variantColors[variant].inactiveText;
+
   const animatedColor = useAnimatedStyle<TextStyle>(() => {
-    if (!animatedActiveOptionIndex) {
+    if (!animatedActiveOptionIndex || textColorActive === textColorInactive) {
       return {};
     }
 
@@ -57,7 +62,7 @@ function SwitchItem<TValue>(props: {
         animatedActiveOptionIndex?.value === index
           ? textColorActive
           : textColorInactive,
-        { duration: 100 }
+        { duration: 200 }
       ),
     };
   });
@@ -78,7 +83,12 @@ function SwitchItem<TValue>(props: {
       ]}
     >
       <AnimatedText
-        style={[styles.textDefault, customTextStyle, animatedColor]}
+        style={[
+          styles.textDefault,
+          inactiveTextStyle,
+          isActive && activeTextStyle,
+          animatedColor,
+        ]}
       >
         {item.label}
       </AnimatedText>
@@ -90,14 +100,13 @@ const styles = StyleSheet.create({
   containerDefault: {
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 12,
   },
   containerSegmentedControl: {
     borderRadius: 999,
     alignSelf: 'center',
   },
-  containerTabs: {
-    paddingHorizontal: 10,
-  },
+  containerTabs: {},
   textDefault: {
     fontSize: 16,
     fontWeight: 'bold',

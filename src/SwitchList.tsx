@@ -5,21 +5,22 @@ import Animated from 'react-native-reanimated';
 import type { ControllerVariant, ControlOption } from './types';
 import type { ControlListState } from './useControlListState';
 import SwitchItem from './SwitchItem';
+import { commonColors } from './constants';
 
 type AlignmentOption = 'left' | 'right' | 'center';
 
 export type SwitchListStylingProps = {
-  align?: AlignmentOption;
-  customItemStyle?: ViewStyle;
-  containerHeight?: number;
-  itemHeight?: number;
-  inactiveBackgroundColor?: string;
-  activeBackgroundColor?: string;
-  inactiveTextColor?: string;
-  activeTextColor?: string;
-  customContainerStyle?: ViewStyle;
-  customTextStyle?: TextStyle;
-  customActiveOptionStyle?: ViewStyle;
+  containerStyle?: ViewStyle;
+  inactiveOptionContainerStyle?: ViewStyle;
+  activeOptionContainerStyle?: ViewStyle;
+  inactiveTextStyle?: TextStyle;
+  activeTextStyle?: TextStyle;
+  containerHeight: number;
+  containerPadding?: number;
+  optionGap: number;
+  optionHeight: number;
+  optionPadding: number;
+  align: AlignmentOption;
 };
 
 export type SwitchListProps<TValue> = ControlListState<TValue> &
@@ -40,35 +41,33 @@ function SwitchList<TValue>(props: SwitchListProps<TValue>) {
     controlListRef,
     onPressItem,
     variant,
+
     // Style props
-    align = 'center',
-    customItemStyle,
-    containerHeight = 50,
-    itemHeight = 48,
-    inactiveBackgroundColor = 'rgb(232, 221, 250)',
-    activeBackgroundColor = 'rgb(124, 58, 237)',
-    inactiveTextColor = 'rgb(124, 58, 237)',
-    activeTextColor = '#fff',
-    customContainerStyle,
-    customTextStyle,
-    customActiveOptionStyle,
+    containerStyle,
+    inactiveOptionContainerStyle,
+    activeOptionContainerStyle,
+    inactiveTextStyle,
+    activeTextStyle,
+    containerHeight,
+    containerPadding,
+    optionGap,
+    optionHeight,
+    align,
   } = props;
 
-  const containerPadding = (containerHeight - itemHeight) / 2;
+  const isSegmentedControlVariant = variant === 'segmentedControl';
 
-  const defaultItemStyle: ViewStyle = useMemo(
-    () => ({
-      height: itemHeight || 48,
-      paddingVertical: 8,
-      paddingHorizontal: 12,
-    }),
-    [itemHeight]
-  );
+  const itemContainerStyle: ViewStyle = useMemo(() => {
+    return {
+      height: optionHeight,
+      ...inactiveOptionContainerStyle,
+    };
+  }, [optionHeight, inactiveOptionContainerStyle]);
 
   const renderItem = useCallback(
     ({ item, index }: { item: ControlOption<TValue>; index: number }) => (
       <SwitchItem
-        variant="tabs"
+        variant={variant}
         item={item}
         isActive={activeOption === item.value}
         index={index}
@@ -78,10 +77,9 @@ function SwitchList<TValue>(props: SwitchListProps<TValue>) {
           onAnimationFinish(item.value);
         }}
         animatedActiveOptionIndex={animatedActiveOptionIndex}
-        textColorActive={activeTextColor}
-        textColorInactive={inactiveTextColor}
-        itemContainerStyle={{ ...defaultItemStyle, ...customItemStyle }}
-        customTextStyle={customTextStyle}
+        itemContainerStyle={itemContainerStyle}
+        inactiveTextStyle={inactiveTextStyle}
+        activeTextStyle={activeTextStyle}
       />
     ),
     [
@@ -90,11 +88,10 @@ function SwitchList<TValue>(props: SwitchListProps<TValue>) {
       onAnimationFinish,
       animatedActiveOptionIndex,
       onPressItem,
-      defaultItemStyle,
-      customItemStyle,
-      activeTextColor,
-      inactiveTextColor,
-      customTextStyle,
+      itemContainerStyle,
+      activeTextStyle,
+      inactiveTextStyle,
+      variant,
     ]
   );
 
@@ -104,27 +101,27 @@ function SwitchList<TValue>(props: SwitchListProps<TValue>) {
       padding: containerPadding,
       marginRight: align !== 'right' ? 'auto' : 0,
       marginLeft: align !== 'left' ? 'auto' : 0,
-      backgroundColor: inactiveBackgroundColor,
     };
-  }, [containerHeight, containerPadding, align, inactiveBackgroundColor]);
+  }, [containerHeight, containerPadding, align]);
 
   const defaultActiveOptionStyles: ViewStyle = useMemo(() => {
     const styles: ViewStyle = {
       left: containerPadding,
-      backgroundColor: activeBackgroundColor,
     };
 
-    if (variant === 'segmentedControl') {
-      styles.height = itemHeight;
+    if (isSegmentedControlVariant) {
+      styles.height = optionHeight;
       styles.top = containerPadding;
     }
 
     return styles;
-  }, [containerPadding, activeBackgroundColor, itemHeight, variant]);
+  }, [containerPadding, optionHeight, isSegmentedControlVariant]);
 
   const ItemSeparatorComponent = useMemo(() => {
-    return variant !== 'segmentedControl' ? ItemSpace : null;
-  }, [variant]);
+    if (!optionGap) return null;
+
+    return <ItemSpace gap={optionGap} />;
+  }, [optionGap]);
 
   if (!options.length) return null;
 
@@ -132,21 +129,21 @@ function SwitchList<TValue>(props: SwitchListProps<TValue>) {
     <View
       style={[
         styles.container,
-        variant === 'segmentedControl'
+        isSegmentedControlVariant
           ? styles.containerSegmentedControl
           : styles.containerTabs,
         containerStyles,
-        customContainerStyle,
+        containerStyle,
       ]}
     >
       <Animated.View
         style={[
           styles.activeOption,
-          variant === 'segmentedControl'
+          isSegmentedControlVariant
             ? styles.activeOptionSegmentedControl
             : styles.activeOptionTabs,
           defaultActiveOptionStyles,
-          customActiveOptionStyle,
+          activeOptionContainerStyle,
           animatedActiveOptionStyle,
         ]}
       />
@@ -157,7 +154,7 @@ function SwitchList<TValue>(props: SwitchListProps<TValue>) {
         accessibilityRole="tablist"
         data={options}
         keyExtractor={(item) => String(item.value)}
-        ItemSeparatorComponent={ItemSeparatorComponent}
+        ItemSeparatorComponent={() => ItemSeparatorComponent}
         renderItem={renderItem}
         showsHorizontalScrollIndicator={false}
         horizontal
@@ -168,13 +165,14 @@ function SwitchList<TValue>(props: SwitchListProps<TValue>) {
   );
 }
 
-function ItemSpace() {
-  return <View style={{ width: 20 }} />;
+function ItemSpace({ gap }: { gap: number }) {
+  return <View style={{ width: gap }} />;
 }
 
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
+    backgroundColor: commonColors.containerBackground,
   },
   containerSegmentedControl: {
     borderRadius: 999,
@@ -182,6 +180,7 @@ const styles = StyleSheet.create({
   containerTabs: {},
   activeOption: {
     position: 'absolute',
+    backgroundColor: commonColors.activeOptionBackground,
   },
   activeOptionSegmentedControl: {
     borderRadius: 999,
@@ -190,7 +189,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     height: 2,
-    backgroundColor: 'red',
   },
 });
 

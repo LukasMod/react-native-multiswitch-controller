@@ -129,14 +129,14 @@ The main switch component.
 <PillSwitch
   align?: 'left' | 'right' | 'center';
   onPressCallback?: (value: TValue) => void;
-  customItemStyle?: ViewStyle;
+  inactiveOptionContainerStyle?: ViewStyle;
   containerHeight?: number;
-  itemHeight?: number;
+  optionHeight?: number;
   inactiveBackgroundColor?: string;
   activeBackgroundColor?: string;
   inactiveTextColor?: string;
   activeTextColor?: string;
-  customTextStyle?: TextStyle;
+  inactiveTextStyle?: TextStyle;
 />
 ```
 
