@@ -1,31 +1,15 @@
 import { createStaticNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Button } from 'react-native';
 import ExampleInitialSetScreen from './screens/ExampleInitialSet';
-import TabsExampleScreen from './screens/TabsExample';
-import SegmentedControlExampleScreen from './screens/SegmentedControlExample';
+import ExamplesScreen from './screens/Examples';
 
 export const RootStack = createNativeStackNavigator({
   initialRouteName: 'SegmentedControlExample',
   screens: {
     SegmentedControlExample: {
-      screen: SegmentedControlExampleScreen,
-      options: ({ navigation }) => ({
-        title: 'Segmeneted Control',
-        headerRight: () => (
-          <Button
-            title="Tabs"
-            onPress={() => {
-              navigation.navigate('TabsExample');
-            }}
-          />
-        ),
-      }),
-    },
-    TabsExample: {
-      screen: TabsExampleScreen,
+      screen: ExamplesScreen,
       options: () => ({
-        title: 'Example Tabs',
+        title: 'Examples',
       }),
     },
     ExampleInitialSet: {

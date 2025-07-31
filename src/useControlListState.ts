@@ -72,8 +72,8 @@ function useControlListState<TValue>(
 
   const optionsRef = useRef(options);
 
-  const optionGap = variant === 'tabs' ? tabConfig?.gap || 0 : 0;
-  const optionPadding = variant === 'tabs' ? tabConfig?.padding || 0 : 0;
+  const optionGap = variant === 'tabs' ? tabConfig?.gap || 20 : 0;
+  const optionPadding = variant === 'tabs' ? tabConfig?.padding || 10 : 0;
 
   const [activeOption, setActiveOption] = useState<TValue>(defaultOption);
 

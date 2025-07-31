@@ -31,14 +31,14 @@ export default function ExampleInitialSetScreen({
             { value: 'night', label: '🌙' },
           ]}
           defaultOption="morning"
-          variant="segmentedControl"
-          onControlListStateChange={(value) => {
+          variant="tabs"
+          onChangeOption={(value) => {
             console.log(
-              'State ExampleInitialSetScreen onControlListStateChange changed:',
+              'State ExampleInitialSetScreen onChangeOption changed:',
               value
             );
           }}
-          segmentedControlProps={{
+          styleProps={{
             inactiveBackgroundColor: 'rgba(59, 130, 246, 0.08)',
             activeBackgroundColor: 'rgb(37, 99, 235)',
           }}

@@ -1,18 +1,16 @@
 import { useEffect, type Ref } from 'react';
-import SegmentedControlSwitch, {
-  type SegmentedControlProps,
-} from './SegmentedControlSwitch';
+import SwitchList, { type SwitchListStylingProps } from './SwitchList';
+import type { ControlOption, ControllerVariant } from './types';
 import useControlListState, {
   type ControlListRef,
 } from './useControlListState';
-import type { ControlOption } from './types';
 
 type MultiswitchControllerProps<TValue> = {
   options: ControlOption<TValue>[];
   defaultOption: TValue;
-  variant?: 'segmentedControl' | 'tabs';
+  variant?: ControllerVariant;
   onChangeOption?: (value: TValue) => void;
-  styleProps?: SegmentedControlProps<TValue>;
+  styleProps?: SwitchListStylingProps;
   onPressItem?: (value: TValue) => void;
   ref?: Ref<ControlListRef<TValue>>;
 };
@@ -50,7 +48,7 @@ function MultiswitchController<TValue>({
   }, [activeOption, onChangeOption]);
 
   return (
-    <SegmentedControlSwitch
+    <SwitchList
       options={options}
       activeOption={activeOption}
       onLayoutOptionItem={onLayoutOptionItem}
@@ -60,6 +58,7 @@ function MultiswitchController<TValue>({
       scrollHandler={scrollHandler}
       controlListRef={controlListRef}
       onPressItem={onPressItem}
+      variant={variant}
       {...styleProps}
     />
   );

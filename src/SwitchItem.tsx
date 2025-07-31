@@ -11,26 +11,25 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import type { ControlOption } from './types';
+import type { ControllerVariant, ControlOption } from './types';
+import { memo } from 'react';
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
-export type SegmentedControlVariant = {
-  optionsWrapperPadding: number;
-  optionHeight: number;
-};
-
-function SegmentedControlSwitchItem<TValue>(props: {
+function SwitchItem<TValue>(props: {
   item: ControlOption<TValue>;
   isActive: boolean;
   index: number;
   onLayout: (event: LayoutChangeEvent, index: number) => void;
   onChange: (value: TValue) => void;
-  animatedActiveOptionIndex: SharedValue<number | null>;
-  textColorActive: string;
-  textColorInactive: string;
+  variant: ControllerVariant;
+
   customTextStyle?: TextStyle;
   itemContainerStyle?: ViewStyle;
+
+  animatedActiveOptionIndex?: SharedValue<number | null>;
+  textColorActive: string;
+  textColorInactive: string;
 }) {
   const {
     item,
@@ -38,21 +37,30 @@ function SegmentedControlSwitchItem<TValue>(props: {
     onChange,
     onLayout,
     index,
+    variant,
+
+    customTextStyle,
+    itemContainerStyle,
+
     animatedActiveOptionIndex,
     textColorActive,
     textColorInactive,
-    customTextStyle,
-    itemContainerStyle,
   } = props;
 
-  const animatedColor = useAnimatedStyle<TextStyle>(() => ({
-    color: withTiming(
-      animatedActiveOptionIndex.value === index
-        ? textColorActive
-        : textColorInactive,
-      { duration: 100 }
-    ),
-  }));
+  const animatedColor = useAnimatedStyle<TextStyle>(() => {
+    if (!animatedActiveOptionIndex) {
+      return {};
+    }
+
+    return {
+      color: withTiming(
+        animatedActiveOptionIndex?.value === index
+          ? textColorActive
+          : textColorInactive,
+        { duration: 100 }
+      ),
+    };
+  });
 
   return (
     <Pressable
@@ -62,7 +70,12 @@ function SegmentedControlSwitchItem<TValue>(props: {
       accessibilityState={{ selected: isActive }}
       accessibilityLabel={item.label}
       disabled={isActive}
-      style={[styles.containerDefault, itemContainerStyle]}
+      style={[
+        styles.containerDefault,
+        variant === 'segmentedControl' && styles.containerSegmentedControl,
+        variant === 'tabs' && styles.containerTabs,
+        itemContainerStyle,
+      ]}
     >
       <AnimatedText
         style={[styles.textDefault, customTextStyle, animatedColor]}
@@ -75,10 +88,15 @@ function SegmentedControlSwitchItem<TValue>(props: {
 
 const styles = StyleSheet.create({
   containerDefault: {
-    borderRadius: 999,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  containerSegmentedControl: {
+    borderRadius: 999,
     alignSelf: 'center',
+  },
+  containerTabs: {
+    paddingHorizontal: 10,
   },
   textDefault: {
     fontSize: 16,
@@ -86,4 +104,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SegmentedControlSwitchItem;
+export default memo(SwitchItem);

@@ -3,3 +3,5 @@ export type ControlOption<TValue> = {
   label: string;
   //   icon?: ControlOptionIcon;
 };
+
+export type ControllerVariant = 'segmentedControl' | 'tabs';

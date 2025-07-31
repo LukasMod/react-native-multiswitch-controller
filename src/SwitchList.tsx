@@ -2,13 +2,13 @@ import { useCallback, useMemo } from 'react';
 import { StyleSheet, View, type TextStyle, type ViewStyle } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-import SegmentedControlSwitchItem from './SegmentedControlSwitchItem';
-import type { ControlOption } from './types';
+import type { ControllerVariant, ControlOption } from './types';
 import type { ControlListState } from './useControlListState';
+import SwitchItem from './SwitchItem';
 
 type AlignmentOption = 'left' | 'right' | 'center';
 
-export type SegmentedControlStylingProps = {
+export type SwitchListStylingProps = {
   align?: AlignmentOption;
   customItemStyle?: ViewStyle;
   containerHeight?: number;
@@ -22,16 +22,13 @@ export type SegmentedControlStylingProps = {
   customActiveOptionStyle?: ViewStyle;
 };
 
-export type SegmentedControlProps<TValue> = SegmentedControlStylingProps & {
-  onPressItem?: (value: TValue) => void;
-};
+export type SwitchListProps<TValue> = ControlListState<TValue> &
+  SwitchListStylingProps & {
+    onPressItem?: (value: TValue) => void;
+    variant: ControllerVariant;
+  };
 
-export type SegmentedControlSwitchProps<TValue> = ControlListState<TValue> &
-  SegmentedControlProps<TValue>;
-
-function SegmentedControlSwitch<TValue>(
-  props: SegmentedControlSwitchProps<TValue>
-) {
+function SwitchList<TValue>(props: SwitchListProps<TValue>) {
   const {
     options,
     activeOption,
@@ -42,7 +39,7 @@ function SegmentedControlSwitch<TValue>(
     scrollHandler,
     controlListRef,
     onPressItem,
-
+    variant,
     // Style props
     align = 'center',
     customItemStyle,
@@ -70,7 +67,8 @@ function SegmentedControlSwitch<TValue>(
 
   const renderItem = useCallback(
     ({ item, index }: { item: ControlOption<TValue>; index: number }) => (
-      <SegmentedControlSwitchItem
+      <SwitchItem
+        variant="tabs"
         item={item}
         isActive={activeOption === item.value}
         index={index}
@@ -111,21 +109,42 @@ function SegmentedControlSwitch<TValue>(
   }, [containerHeight, containerPadding, align, inactiveBackgroundColor]);
 
   const defaultActiveOptionStyles: ViewStyle = useMemo(() => {
-    return {
-      height: itemHeight,
-      top: containerPadding,
+    const styles: ViewStyle = {
       left: containerPadding,
       backgroundColor: activeBackgroundColor,
     };
-  }, [containerPadding, activeBackgroundColor, itemHeight]);
+
+    if (variant === 'segmentedControl') {
+      styles.height = itemHeight;
+      styles.top = containerPadding;
+    }
+
+    return styles;
+  }, [containerPadding, activeBackgroundColor, itemHeight, variant]);
+
+  const ItemSeparatorComponent = useMemo(() => {
+    return variant !== 'segmentedControl' ? ItemSpace : null;
+  }, [variant]);
 
   if (!options.length) return null;
 
   return (
-    <View style={[styles.container, containerStyles, customContainerStyle]}>
+    <View
+      style={[
+        styles.container,
+        variant === 'segmentedControl'
+          ? styles.containerSegmentedControl
+          : styles.containerTabs,
+        containerStyles,
+        customContainerStyle,
+      ]}
+    >
       <Animated.View
         style={[
           styles.activeOption,
+          variant === 'segmentedControl'
+            ? styles.activeOptionSegmentedControl
+            : styles.activeOptionTabs,
           defaultActiveOptionStyles,
           customActiveOptionStyle,
           animatedActiveOptionStyle,
@@ -138,6 +157,7 @@ function SegmentedControlSwitch<TValue>(
         accessibilityRole="tablist"
         data={options}
         keyExtractor={(item) => String(item.value)}
+        ItemSeparatorComponent={ItemSeparatorComponent}
         renderItem={renderItem}
         showsHorizontalScrollIndicator={false}
         horizontal
@@ -148,15 +168,30 @@ function SegmentedControlSwitch<TValue>(
   );
 }
 
+function ItemSpace() {
+  return <View style={{ width: 20 }} />;
+}
+
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 999,
     overflow: 'hidden',
   },
-  activeOption: {
+  containerSegmentedControl: {
     borderRadius: 999,
+  },
+  containerTabs: {},
+  activeOption: {
     position: 'absolute',
+  },
+  activeOptionSegmentedControl: {
+    borderRadius: 999,
+  },
+  activeOptionTabs: {
+    bottom: 0,
+    left: 0,
+    height: 2,
+    backgroundColor: 'red',
   },
 });
 
-export default SegmentedControlSwitch;
+export default SwitchList;
