@@ -14,6 +14,7 @@ import DayOfTime from '../examples/DayOfTime';
 import LongLabel from '../examples/LongLabel';
 import Scrollable from '../examples/Scrollable';
 import type { TimeOfDay } from '../types';
+import DynamicLabels from '../examples/DynamicLabels';
 
 type ExamplesScreenProps = StaticScreenProps<{
   timeOfDay?: TimeOfDay;
@@ -72,7 +73,6 @@ export default function ExamplesScreen({ route }: ExamplesScreenProps) {
 
   // onChangeOptionHandler - after animation is done
   const onChangeOptionHandler = useCallback((value: TimeOfDay) => {
-    console.log('TEST onChangeOptionHandler - after animation is done', value);
     setTimeOfDay(value);
   }, []);
 
@@ -90,6 +90,15 @@ export default function ExamplesScreen({ route }: ExamplesScreenProps) {
       <Align variant={variant} key={`Align-${variant}`} />
       <LongLabel variant={variant} key={`LongLabel-${variant}`} />
       <Scrollable variant={variant} key={`Scrollable-${variant}`} />
+      <DynamicLabels variant={variant} key={`DynamicLabels-${variant}`} />
+      <Button
+        title="Navigate with preselected option"
+        onPress={() => {
+          navigation.navigate('ExampleInitialSet', {
+            favoriteDrink: 'juice',
+          });
+        }}
+      />
     </LinearGradient>
   );
 }

@@ -4,9 +4,9 @@ import ExampleInitialSetScreen from './screens/ExampleInitialSet';
 import ExamplesScreen from './screens/Examples';
 
 export const RootStack = createNativeStackNavigator({
-  initialRouteName: 'SegmentedControlExample',
+  initialRouteName: 'Examples',
   screens: {
-    SegmentedControlExample: {
+    Examples: {
       screen: ExamplesScreen,
       options: () => ({
         title: 'Examples',
@@ -15,7 +15,7 @@ export const RootStack = createNativeStackNavigator({
     ExampleInitialSet: {
       screen: ExampleInitialSetScreen,
       options: () => ({
-        title: 'Example Initial Based on Route',
+        title: 'Preselected option',
       }),
     },
   },

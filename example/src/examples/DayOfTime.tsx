@@ -64,7 +64,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
   containerStyle: {
     backgroundColor: 'rgba(59, 130, 246, 0.08)',
   },

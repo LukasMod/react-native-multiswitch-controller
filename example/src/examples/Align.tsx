@@ -37,7 +37,7 @@ export default function Align({ variant }: AlignProps) {
           { value: 'First', label: 'First' },
           { value: 'Second', label: 'Second' },
         ]}
-        defaultOption="Second"
+        defaultOption="First"
         variant={variant}
         align="center"
         containerHeight={28}
