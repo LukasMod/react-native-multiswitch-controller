@@ -2,6 +2,10 @@
 
 A smooth, animated multiswitch component for React Native with dynamic width support. Perfect for creating segmented controls and tab interfaces with fluid animations.
 
+[[Segmented Control]](https://github.com/user-attachments/assets/f5eacb8e-a525-4295-8ea7-e5d695eab01b)
+
+[[Tabs]](https://github.com/user-attachments/assets/ea1dcc38-0fe4-4263-9155-87dce55def33)
+
 ## Why?
 
 In my last project, there were specific design requirements for segmented control buttons and tabs with customized UI.
@@ -312,3 +316,4 @@ const [language, setLanguage] = useState<'en' | 'de'>('en');
 ## License
 
 MIT © [LukasMod](https://github.com/LukasMod)
+
