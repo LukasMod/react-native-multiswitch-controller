@@ -137,33 +137,12 @@ type ControlListRef<TValue> = {
     { value: 'night', label: '🌙' },
   ]}
   onChangeOption={onChangeOption}
-  optionGap={10}
 />
 ```
 
 ### Alignment Examples
 
 ```tsx
-// Left alignment
-<MultiswitchController<'First' | 'Second'>
-  options={[
-    { value: 'First', label: 'First' },
-    { value: 'Second', label: 'Second' },
-  ]}
-  defaultOption="First"
-  align="left"
-/>
-
-// Center alignment
-<MultiswitchController<'First' | 'Second'>
-  options={[
-    { value: 'First', label: 'First' },
-    { value: 'Second', label: 'Second' },
-  ]}
-  defaultOption="First"
-  align="center"
-/>
-
 // Right alignment
 <MultiswitchController<'First' | 'Second' | 'Third'>
   options={[
@@ -236,7 +215,6 @@ function MyComponent() {
     { value: 'Sixteenth', label: 'Sixteenth' },
   ]}
   defaultOption="First"
-  variant={variant}
 />
 ```
 
@@ -248,7 +226,6 @@ function MyComponent() {
     { value: 'First', label: 'First is a very long label' },
     { value: 'Second', label: 'Second is short' },
   ]}
-  variant={variant}
   defaultOption="First"
 />
 ```
