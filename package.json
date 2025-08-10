@@ -1,6 +1,6 @@
 {
   "name": "react-native-multiswitch-controller",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Smooth animated multiswitch component with dynamic width",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
